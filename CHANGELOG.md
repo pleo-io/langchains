@@ -1,3 +1,20 @@
+# v0.0.4 (Wed Aug 16 2023)
+
+#### 🐞 Fixes
+
+- Fix labels [#9](https://github.com/pleo-io/langchains/pull/9) ([@andersfischernielsen](https://github.com/andersfischernielsen))
+
+#### ⚠️ Pushed to `main`
+
+- Add MyPy configuration ([@andersfischernielsen](https://github.com/andersfischernielsen))
+- Ensure proper refs ([@andersfischernielsen](https://github.com/andersfischernielsen))
+
+#### Authors: 1
+
+- Anders Fischer-Nielsen ([@andersfischernielsen](https://github.com/andersfischernielsen))
+
+---
+
 # v0.0.3 (Wed Aug 16 2023)
 
 #### 🐞 Fixes
