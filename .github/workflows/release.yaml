@@ -18,15 +18,38 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Allow pushing version updates to the default branch
+        id: get-admin-token
+        uses: peter-murray/workflow-application-token-action@v1
+        with:
+          application_id: ${{ secrets.PLEO_GH_APP_TOKEN_SIGNER_APP_ID }}
+          application_private_key: ${{ secrets.PLEO_GH_APP_TOKEN_SIGNER_PRIVATE_KEY }}
 
-      - name: Release
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ steps.get-admin-token.outputs.token }}
+          fetch-depth: 0
+          ref: main
+
+      - name: Cache Auto
+        id: cache-auto
+        uses: actions/cache@v3
+        with:
+          path: ~/auto
+          key: dependency--intuit/auto-v10.37.2
+
+      - name: Setup Auto
+        if: steps.cache-auto.outputs.cache-hit != 'true'
         run: |
-          npx auto shipit
+          curl -vkL -o - https://github.com/intuit/auto/releases/download/v10.37.2/auto-linux.gz | gunzip > ~/auto
+          chmod a+x ~/auto
+
+      - name: Run Auto release
+        run: |
+          ~/auto shipit
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release-python-package:
     name: Release Python package
