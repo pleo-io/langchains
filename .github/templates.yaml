@@ -3,8 +3,9 @@ version: v23.1.2
 files:
   - .github/workflows/k8s_ci.yaml
   - .github/workflows/trigger-flux-application-registration.yaml
+  - .github/workflows/verify-release.toml
   - .github/.kodiak.toml
-  - .github/verify-release.toml
+  - .autorc.json
 
 values:
   gitOpsEnabled: true
