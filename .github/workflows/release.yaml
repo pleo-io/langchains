@@ -89,57 +89,51 @@ jobs:
       - name: Install project
         run: poetry install --no-interaction
 
-      - name: Get PR
-        uses: 8BitJonny/gh-get-current-pr@2.2.0
-        id: detect-pr
+      - name: Cache Auto
+        id: cache-auto
+        uses: actions/cache@v3
+        with:
+          path: ~/auto
+          key: dependency--intuit/auto-v10.37.2
+
+      - name: Setup Auto
+        if: steps.cache-auto.outputs.cache-hit != 'true'
+        run: |
+          curl -vkL -o - https://github.com/intuit/auto/releases/download/v10.37.2/auto-linux.gz | gunzip > ~/auto
+          chmod a+x ~/auto
 
       - name: Get PR labels
-        if: steps.detect-pr.outputs.pr_found == 'true'
-        id: release-label
-        uses: actions/github-script@v6
-        env:
-          PR_NUMBER: ${{steps.detect-pr.outputs.prNumber}}
-        with:
-          script: |
-            const process = require('process')
-            const prNumber = process.env["PR_NUMBER"]
-            if (!prNumber) {
-              core.setFailed('Could not get pull request number, exiting')
-              process.exit(1)
-            }
-
-            const pr = github.rest.issues({issue_number: prNumber})
-            core.debug(pr)
-            const labels = pr.labels.map(label => label.name)
-            core.debug(labels)
-            if (labels.includes('major')) {
-              core.setOutput('label', 'major')
-            }
-            else if (labels.includes('minor')) {
-              core.setOutput('label', 'minor')
-            }
-            else if (labels.includes('patch')) {
-              core.setOutput('label', 'patch')
-            }
-            else {
-              core.setOutput('label', 'internal')
-            }
-
-      - name: Bump version
-        if: steps.release-label.outputs.label != 'internal'
+        id: auto-label
         run: |
-          poetry version ${{ steps.pr-labels.outputs.label }}
+          LABELS="$(~/auto label)"
+          echo $LABELS
+          echo "labels=$LABELS" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Allow pushing version updates to the default branch
-        if: steps.detect-pr.outputs.pr_found == 'true'
-        id: get-admin-token
-        uses: peter-murray/workflow-application-token-action@v2
-        with:
-          application_id: ${{ secrets.PLEO_GH_APP_TOKEN_SIGNER_APP_ID }}
-          application_private_key: ${{ secrets.PLEO_GH_APP_TOKEN_SIGNER_PRIVATE_KEY }}
+      - name: Get release label
+        id: release-label
+        run: |
+          echo ${{ steps.auto-label.outputs.labels }}
+          echo $AUTO_LABEL
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push changes (Git)
-        if: steps.detect-pr.outputs.pr_found == 'true'
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ steps.get-admin-token.outputs.token }}
+      # - name: Bump version
+      #   if: steps.release-label.outputs.label != 'internal'
+      #   run: |
+      #     poetry version ${{ steps.pr-labels.outputs.label }}
+
+      # - name: Allow pushing version updates to the default branch
+      #   if: steps.detect-pr.outputs.pr_found == 'true'
+      #   id: get-admin-token
+      #   uses: peter-murray/workflow-application-token-action@v2
+      #   with:
+      #     application_id: ${{ secrets.PLEO_GH_APP_TOKEN_SIGNER_APP_ID }}
+      #     application_private_key: ${{ secrets.PLEO_GH_APP_TOKEN_SIGNER_PRIVATE_KEY }}
+
+      # - name: Push changes (Git)
+      #   if: steps.detect-pr.outputs.pr_found == 'true'
+      #   uses: ad-m/github-push-action@master
+      #   with:
+      #     github_token: ${{ steps.get-admin-token.outputs.token }}
