@@ -30,7 +30,6 @@ jobs:
         with:
           token: ${{ steps.get-admin-token.outputs.token }}
           fetch-depth: 0
-          ref: main
 
       - name: Cache Auto
         id: cache-auto
@@ -63,6 +62,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: main
 
       - name: Set up Python
         id: setup-python
