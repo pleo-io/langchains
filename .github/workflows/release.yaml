@@ -103,7 +103,7 @@ jobs:
           chmod a+x ~/auto
 
       - name: Get PR labels
-        id: auto-label
+        id: release-label
         run: |
           LABELS="$(~/auto label)"
           echo $LABELS
@@ -111,29 +111,21 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get release label
-        id: release-label
+      - name: Bump version
+        if: steps.release-label.outputs.label != 'internal'
         run: |
-          echo ${{ steps.auto-label.outputs.labels }}
-          echo $AUTO_LABEL
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          poetry version ${{ steps.release-label.outputs.labels }}
 
-      # - name: Bump version
-      #   if: steps.release-label.outputs.label != 'internal'
-      #   run: |
-      #     poetry version ${{ steps.pr-labels.outputs.label }}
+      - name: Allow pushing version updates to the default branch
+        if: steps.release-label.outputs.labels != 'internal'
+        id: get-admin-token
+        uses: peter-murray/workflow-application-token-action@v2
+        with:
+          application_id: ${{ secrets.PLEO_GH_APP_TOKEN_SIGNER_APP_ID }}
+          application_private_key: ${{ secrets.PLEO_GH_APP_TOKEN_SIGNER_PRIVATE_KEY }}
 
-      # - name: Allow pushing version updates to the default branch
-      #   if: steps.detect-pr.outputs.pr_found == 'true'
-      #   id: get-admin-token
-      #   uses: peter-murray/workflow-application-token-action@v2
-      #   with:
-      #     application_id: ${{ secrets.PLEO_GH_APP_TOKEN_SIGNER_APP_ID }}
-      #     application_private_key: ${{ secrets.PLEO_GH_APP_TOKEN_SIGNER_PRIVATE_KEY }}
-
-      # - name: Push changes (Git)
-      #   if: steps.detect-pr.outputs.pr_found == 'true'
-      #   uses: ad-m/github-push-action@master
-      #   with:
-      #     github_token: ${{ steps.get-admin-token.outputs.token }}
+      - name: Push changes (Git)
+        if: steps.release-label.outputs.labels != 'internal'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ steps.get-admin-token.outputs.token }}
