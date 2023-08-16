@@ -1,4 +1,4 @@
-version: v23.1.2
+version: v23.1.1
 
 files:
   - .github/workflows/verify-release.toml
