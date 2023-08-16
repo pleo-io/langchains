@@ -1,7 +1,7 @@
-version: v23.1.2
+version: v23.1.1
 
 files:
-  - .github/workflows/verify-release.toml
+  - .github/workflows/verify-release.yaml
   - .github/.kodiak.toml
   - .autorc.json
 
