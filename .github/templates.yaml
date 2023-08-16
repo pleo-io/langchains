@@ -1,0 +1,11 @@
+version: v23.1.2
+
+files:
+  - .github/workflows/k8s_ci.yaml
+  - .github/workflows/trigger-flux-application-registration.yaml
+  - .github/.kodiak.toml
+  - .github/verify-release.toml
+
+values:
+  gitOpsEnabled: true
+  allowKodiakAutoMerge: true

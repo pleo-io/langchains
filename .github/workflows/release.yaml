@@ -1,0 +1,113 @@
+name: Release
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  create-github-release:
+    name: Create GitHub release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Release
+        run: |
+          npx auto shipit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-python-package:
+    name: Release Python package
+    needs: create-github-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      - name: Install project
+        run: poetry install --no-interaction
+
+      - name: Get PR
+        uses: 8BitJonny/gh-get-current-pr@2.2.0
+        id: detect-pr
+
+      - name: Get PR labels
+        if: steps.detect-pr.outputs.pr_found == 'true'
+        id: release-label
+        uses: actions/github-script@v6
+        env:
+          PR_NUMBER: ${{steps.detect-pr.outputs.prNumber}}
+        with:
+          script: |
+            const pr_number = process.env.PR_NUMBER
+            if (!pr_number) {
+              core.setFailed('Could not get pull request number, exiting')
+              process.exit(1)
+            }
+
+            const pr = github.rest.issues({issue_number: pr_number})
+            const labels = pr.labels.map(label => label.name)
+            if labels.includes('major') {
+              core.setOutput('label', 'major')
+            }
+            else if labels.includes('minor') {
+              core.setOutput('label', 'minor')
+            }
+            else if labels.includes('patch') {
+              core.setOutput('label', 'patch')
+            }
+            return 'internal'
+
+      - name: Bump version
+        if: steps.release-label.outputs.label != 'internal'
+        run: |
+          poetry version ${{ steps.pr-labels.outputs.label }}
+
+      - name: Allow pushing version updates to the default branch
+        if: steps.detect-pr.outputs.pr_found == 'true'
+        id: get-admin-token
+        uses: peter-murray/workflow-application-token-action@v2
+        with:
+          application_id: ${{ secrets.PLEO_GH_APP_TOKEN_SIGNER_APP_ID }}
+          application_private_key: ${{ secrets.PLEO_GH_APP_TOKEN_SIGNER_PRIVATE_KEY }}
+
+      - name: Push changes (Git)
+        if: steps.detect-pr.outputs.pr_found == 'true'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ steps.get-admin-token.outputs.token }}
