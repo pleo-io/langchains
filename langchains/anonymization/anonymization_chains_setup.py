@@ -1,11 +1,10 @@
-from chat_gpt.anonymization_chain import AnonymizationChain
-from chat_gpt.de_anonymization_chain import DeAnonymizationChain
+from langchains.anonymization.anonymization_chain import AnonymizationChain
+from langchains.anonymization.de_anonymization_chain import DeAnonymizationChain
 from langchain.llms import BaseLLM
+from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import SimpleSequentialChain, ConversationChain
 from logging import Logger
-
-from chat_gpt.prompt import generate_prompt
 
 
 def setup_anonymization_chains(key: bytes):
@@ -17,6 +16,7 @@ def setup_anonymization_chains(key: bytes):
 def setup_conversational_chain(
     anonymization_chain: AnonymizationChain,
     de_anonymization_chain: DeAnonymizationChain,
+    prompt: PromptTemplate,
     llm: BaseLLM,
     memory: ConversationBufferMemory,
     logger: Logger,
@@ -28,7 +28,7 @@ def setup_conversational_chain(
             anonymization_chain,
             ConversationChain(
                 llm=llm,
-                prompt=generate_prompt(),
+                prompt=prompt,
                 verbose=True,
                 memory=memory,
                 input_key="anonymized",

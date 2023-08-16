@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "LangChain chains for use with LLMs"
 authors = ["Anders Fischer-Nielsen <andersfischern@me.com>"]
 readme = "README.md"
-packages = [{include = "chains"}]
+packages = [{include = "langchains"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
