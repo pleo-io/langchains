@@ -1,3 +1,19 @@
+# v0.0.2 (Wed Aug 16 2023)
+
+#### 🐞 Fixes
+
+- Fix labels [#7](https://github.com/pleo-io/langchains/pull/7) ([@andersfischernielsen](https://github.com/andersfischernielsen))
+
+#### 🏠 Internal
+
+- Fix labels [#6](https://github.com/pleo-io/langchains/pull/6) ([@andersfischernielsen](https://github.com/andersfischernielsen))
+
+#### Authors: 1
+
+- Anders Fischer-Nielsen ([@andersfischernielsen](https://github.com/andersfischernielsen))
+
+---
+
 # v0.0.1 (Wed Aug 16 2023)
 
 #### 🐞 Fixes
