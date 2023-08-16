@@ -108,7 +108,9 @@ jobs:
             }
 
             const pr = github.rest.issues({issue_number: pr_number})
+            core.debug(pr)
             const labels = pr.labels.map(label => label.name)
+            core.debug(labels)
             if labels.includes('major') {
               core.setOutput('label', 'major')
             }
@@ -118,7 +120,7 @@ jobs:
             else if labels.includes('patch') {
               core.setOutput('label', 'patch')
             }
-            return 'internal'
+            core.setOutput('label', 'internal')
 
       - name: Bump version
         if: steps.release-label.outputs.label != 'internal'
