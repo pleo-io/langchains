@@ -49,7 +49,7 @@ class DeAnonymizationChain(Chain):
             _text = "Received anonymized answer:\n" + _colored_text
             run_manager.on_text(text=_text, end="\n", verbose=self.verbose)
 
-        matches = findall("<([A-Z_]+)-([A-Za-z0-9+\/=]*)>", answer)
+        matches = findall(r"<([A-Z_]+)-([A-Za-z0-9+\/=]*)>", answer)
         de_anonymized = answer
         for entity, anonymized in matches:
             try:

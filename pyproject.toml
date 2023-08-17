@@ -16,6 +16,7 @@ en_core_web_lg = {url = "https://github.com/explosion/spacy-models/releases/down
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.4.1"
 black = "^23.7.0"
+pytest = "^7.4.0"
 
 [build-system]
 requires = ["poetry-core", "setuptools"]
