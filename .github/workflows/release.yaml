@@ -21,8 +21,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: 8BitJonny/gh-get-current-pr@2.2.0
+        id: determine-pr
 
       - name: Cache Auto
+        if: steps.determine-pr.outputs.pr_found == 'true'
         id: cache-auto
         uses: actions/cache@v3
         with:
@@ -30,12 +36,13 @@ jobs:
           key: dependency--intuit/auto-v10.37.2
 
       - name: Setup Auto
-        if: steps.cache-auto.outputs.cache-hit != 'true'
+        if: steps.determine-pr.outputs.pr_found == 'true' && steps.cache-auto.outputs.cache-hit != 'true'
         run: |
           curl -vkL -o - https://github.com/intuit/auto/releases/download/v10.37.2/auto-linux.gz | gunzip > ~/auto
           chmod a+x ~/auto
 
       - name: Determine version
+        if: steps.determine-pr.outputs.pr_found == 'true'
         id: release-label
         run: |
           version="$(~/auto label)"
