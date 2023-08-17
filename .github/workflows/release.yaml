@@ -130,7 +130,7 @@ jobs:
         if: steps.release-label.outputs.label != 'internal'
         id: bump-version
         run: |
-          echo "version=$(poetry version)" >> $GITHUB_OUTPUT
+          echo "version=$(poetry version --short)" >> $GITHUB_OUTPUT
 
       - name: Push changes (Git)
         if: steps.release-label.outputs.labels != 'internal'
