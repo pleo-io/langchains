@@ -60,11 +60,19 @@ jobs:
       issues: write
       pull-requests: write
     steps:
+      - name: Allow pushing version updates to the default branch
+        id: get-admin-token
+        uses: peter-murray/workflow-application-token-action@v2
+        with:
+          application_id: ${{ secrets.PLEO_GH_APP_TOKEN_SIGNER_APP_ID }}
+          application_private_key: ${{ secrets.PLEO_GH_APP_TOKEN_SIGNER_PRIVATE_KEY }}
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
           ref: main
+          token: ${{ steps.get-admin-token.outputs.token }}
 
       - name: Set up Python
         id: setup-python
@@ -118,16 +126,14 @@ jobs:
         run: |
           poetry version ${{ steps.release-label.outputs.labels }}
 
-      - name: Allow pushing version updates to the default branch
-        if: steps.release-label.outputs.labels != 'internal'
-        id: get-admin-token
-        uses: peter-murray/workflow-application-token-action@v2
-        with:
-          application_id: ${{ secrets.PLEO_GH_APP_TOKEN_SIGNER_APP_ID }}
-          application_private_key: ${{ secrets.PLEO_GH_APP_TOKEN_SIGNER_PRIVATE_KEY }}
+      - name: Bump version
+        if: steps.release-label.outputs.label != 'internal'
+        id: bump-version
+        run: |
+          echo "version=$(poetry version)" >> $GITHUB_OUTPUT
 
       - name: Push changes (Git)
         if: steps.release-label.outputs.labels != 'internal'
-        uses: ad-m/github-push-action@master
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          github_token: ${{ steps.get-admin-token.outputs.token }}
+          commit_message: "Release v${{ steps.bump-version.outputs.version }}"
