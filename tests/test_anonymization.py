@@ -1,11 +1,10 @@
-import pytest
 from langchains.anonymization.anonymization_chain import AnonymizationChain
-from Crypto import Random
-from re import findall, match
+from re import findall
+from base64 import b64decode
 
 base_64_regex = r"<([A-Z_]+)-([A-Za-z0-9+\/=]*)>"
 
-key = Random.get_random_bytes(16)
+key = b64decode("r6fXjPXeemR0szANNILHjA==".encode("utf-8"))
 chain = AnonymizationChain(key=key)
 
 
@@ -16,8 +15,7 @@ def find_anonymized(input: str):
 def test_does_anonymize_with_personal_information_present():
     input = {
         "text": """Hello, my name is David Johnson and I live in Maine.
-    My credit card number is 4095-2609-9393-4932
-    """
+    My credit card number is 4095-2609-9393-4932"""
     }
     result = chain(input)["anonymized"]
     anonymized = find_anonymized(result)

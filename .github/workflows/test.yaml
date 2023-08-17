@@ -41,6 +41,6 @@ jobs:
       - name: Install project
         run: poetry install --no-interaction
 
-      - name: Format
+      - name: Test
         run: |
           poetry run pytest
