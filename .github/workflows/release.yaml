@@ -17,7 +17,7 @@ jobs:
       issues: write
       pull-requests: write
     outputs:
-      version: steps.release-label.outputs.version
+      version: ${{ steps.release-label.outputs.version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -103,10 +103,6 @@ jobs:
 
       - name: Install project
         run: poetry install --no-interaction
-
-      - run: |
-          echo ${{ needs.determine-release.outputs.version }}
-          echo "${{ needs.determine-release.outputs.version }}"
 
       - name: Bump version
         run: |
