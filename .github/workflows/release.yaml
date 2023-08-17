@@ -117,6 +117,7 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           message: Release v${{ steps.bump-version.outputs.version }}
+          push: false
 
       - name: Run Auto release
         run: |
