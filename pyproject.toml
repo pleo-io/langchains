@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "langchains"
-version = "0.0.8"
+version = "0.0.9"
 description = "LangChain chains for use with LLMs"
 authors = ["Anders Fischer-Nielsen <andersfischern@me.com>"]
 readme = "README.md"
