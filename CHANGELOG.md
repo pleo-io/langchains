@@ -1,3 +1,26 @@
+# v0.0.5 (Thu Aug 17 2023)
+
+#### 🐞 Fixes
+
+- Add tests [#13](https://github.com/pleo-io/langchains/pull/13) ([@andersfischernielsen](https://github.com/andersfischernielsen))
+
+#### ⚠️ Pushed to `main`
+
+- Fix version number ([@andersfischernielsen](https://github.com/andersfischernielsen))
+
+#### 🏠 Internal
+
+- Update dependency langchain to ^0.0.266 [#12](https://github.com/pleo-io/langchains/pull/12) (devx+renovate@pleo.io [@pleo-bot-renovate](https://github.com/pleo-bot-renovate))
+- Update dependency centralized-templates to v23.1.2 [#11](https://github.com/pleo-io/langchains/pull/11) (devx+renovate@pleo.io [@pleo-bot-renovate](https://github.com/pleo-bot-renovate))
+
+#### Authors: 3
+
+- Anders Fischer-Nielsen ([@andersfischernielsen](https://github.com/andersfischernielsen))
+- Renovate (devx+renovate@pleo.io)
+- Renovate (Pleo) ([@pleo-bot-renovate](https://github.com/pleo-bot-renovate))
+
+---
+
 # v0.0.4 (Wed Aug 16 2023)
 
 #### 🐞 Fixes
