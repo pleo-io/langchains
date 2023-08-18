@@ -1,6 +1,7 @@
-version: v23.1.2
+version: v23.2.0
 
 files:
+  - .github/workflows/poetry-release.yaml
   - .github/workflows/verify-release.yaml
   - .github/.kodiak.toml
   - .autorc.json
