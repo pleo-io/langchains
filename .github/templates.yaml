@@ -1,4 +1,4 @@
-version: v23.2.0
+version: v23.2.1
 
 files:
   - .github/workflows/poetry-release.yaml
