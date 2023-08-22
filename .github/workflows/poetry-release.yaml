@@ -38,20 +38,31 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/auto
-          key: dependency--intuit/auto-v10.37.2
+          key: dependency--intuit/auto-v10.46.0
 
       - name: Setup Auto
         if: steps.determine-pr.outputs.pr_found == 'true' && steps.cache-auto.outputs.cache-hit != 'true'
         run: |
-          curl -vkL -o - https://github.com/intuit/auto/releases/download/v10.37.2/auto-linux.gz | gunzip > ~/auto
+          curl -vkL -o - https://github.com/intuit/auto/releases/download/v10.46.0/auto-linux.gz | gunzip > ~/auto
           chmod a+x ~/auto
 
       - name: Determine version
         if: steps.determine-pr.outputs.pr_found == 'true'
         id: release-label
         run: |
-          version="$(~/auto label)"
-          echo "$version"
+          labels="$(~/auto label --pr ${{ steps.determine-pr.outputs.number }})"
+          version=""
+
+          if [[ $labels == *"patch"* ]]; then
+            version="patch"
+          fi
+          if [[ $labels == *"minor"* ]]; then
+            version="minor"
+          fi
+          if [[ $labels == *"major"* ]]; then
+            version="major"
+          fi
+
           echo "version=$version" >> "$GITHUB_OUTPUT"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -60,7 +71,7 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     needs: determine-release
-    if: needs.determine-release.outputs.version
+    if: needs.determine-release.outputs.version == 'patch' || needs.determine-release.outputs.version == 'minor' || needs.determine-release.outputs.version == 'major'
     permissions:
       contents: write
       packages: write
@@ -70,7 +81,7 @@ jobs:
       - name: Allow pushing version updates to the default branch (private repository)
         if: ${{ github.event.repository.private == true }}
         id: get-admin-token
-        uses: peter-murray/workflow-application-token-action@v1
+        uses: peter-murray/workflow-application-token-action@v2
         with:
           application_id: ${{ secrets.PLEO_GH_APP_TOKEN_SIGNER_APP_ID }}
           application_private_key: ${{ secrets.PLEO_GH_APP_TOKEN_SIGNER_PRIVATE_KEY }}
@@ -91,7 +102,7 @@ jobs:
 
       - name: Allow pushing version updates to the default branch (public repository)
         if: ${{ github.event.repository.private == false }}
-        uses: webfactory/ssh-agent@v0.5.4
+        uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.RELEASE_KEY }}
 
@@ -100,12 +111,12 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/auto
-          key: dependency--intuit/auto-v10.37.2
+          key: dependency--intuit/auto-v10.46.0
 
       - name: Setup Auto
         if: steps.cache-auto.outputs.cache-hit != 'true'
         run: |
-          curl -vkL -o - https://github.com/intuit/auto/releases/download/v10.37.2/auto-linux.gz | gunzip > ~/auto
+          curl -vkL -o - https://github.com/intuit/auto/releases/download/v10.46.0/auto-linux.gz | gunzip > ~/auto
           chmod a+x ~/auto
 
       - name: Set up Python
@@ -133,7 +144,8 @@ jobs:
       - name: Install project
         run: poetry install --no-interaction
 
-      - name: Bump version
+      - name: Bump ${{ needs.determine-release.outputs.version }} version
+        if: needs.determine-release.outputs.version
         run: |
           poetry version ${{ needs.determine-release.outputs.version }}
 
