@@ -38,12 +38,12 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/auto
-          key: dependency--intuit/auto-v10.46.0
+          key: dependency--intuit/auto-v11.0.4
 
       - name: Setup Auto
         if: steps.determine-pr.outputs.pr_found == 'true' && steps.cache-auto.outputs.cache-hit != 'true'
         run: |
-          curl -vkL -o - https://github.com/intuit/auto/releases/download/v10.46.0/auto-linux.gz | gunzip > ~/auto
+          curl -vkL -o - https://github.com/intuit/auto/releases/download/v11.0.4/auto-linux.gz | gunzip > ~/auto
           chmod a+x ~/auto
 
       - name: Determine version
@@ -111,12 +111,12 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/auto
-          key: dependency--intuit/auto-v10.46.0
+          key: dependency--intuit/auto-v11.0.4
 
       - name: Setup Auto
         if: steps.cache-auto.outputs.cache-hit != 'true'
         run: |
-          curl -vkL -o - https://github.com/intuit/auto/releases/download/v10.46.0/auto-linux.gz | gunzip > ~/auto
+          curl -vkL -o - https://github.com/intuit/auto/releases/download/v11.0.4/auto-linux.gz | gunzip > ~/auto
           chmod a+x ~/auto
 
       - name: Set up Poetry
