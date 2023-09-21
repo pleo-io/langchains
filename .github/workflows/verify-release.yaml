@@ -51,7 +51,7 @@ jobs:
       # Allow caching Gradle executions to further speed up CI/CD steps invoking Gradle.
       - name: Setup Gradle
         if: steps.cache-docs.outputs.cache-hit != 'true'
-        uses: gradle/gradle-build-action@v2.7.0
+        uses: gradle/gradle-build-action@v2.8.0
         with:
           gradle-executable: ./gradlew
           gradle-version: wrapper
