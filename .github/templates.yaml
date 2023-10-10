@@ -1,4 +1,4 @@
-version: v28.1.0
+version: v29.0.0
 
 files:
   - .github/workflows/poetry-release.yaml
